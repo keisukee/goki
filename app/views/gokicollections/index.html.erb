@@ -1,0 +1,97 @@
+<header>
+	<%= link_to maingokis_path do %>
+		<h2 id="username"><%= current_user.name %><br>(Maxscore:<%= current_user.max_score %>)</h2>
+	<% end %>
+	<h1>Goki Collection</h1>
+	<% if user_signed_in? %>
+		<%= link_to destroy_user_session_path, method: :delete do %>
+			<%= image_tag "maingokis/share/logout.png", :size=>"100x100", :id=>"logoutbutton" %>
+		<% end %>
+	<% end %>
+</header>
+
+
+
+<%= form_tag({controller: :gokicollections, action: :destroy_all}, method: "delete", class:"indexform") do %>
+<main id="indexmain">
+	<div class="collection">
+		<% (1..9).each do |i| %>
+
+			<% if !(@users[i-1].nil?) && (@users[i-1].goki.status=="healthy") %>
+				<div class="cell" id="cell"+<%= i.to_s %>>
+					<div class="cell_top" id="cell_top"+<%= i.to_s %>>
+						<%= image_tag "maingokis/index/heroes/"+@users[i-1].goki.img+".png", :size=>"230x130", :class=>"gokis", :id=>"goki"+i.to_s %>
+						<%= check_box_tag("check[#{@users[i-1].goki.id}]", @users[i-1].goki.id) %>
+					</div>
+					<div class="cell_buttom" id="cell_buttom"+<%= i.to_s %>>
+						<p class="gokiname">
+							<%= @users[i-1].goki.name %>
+							(<%= @users[i-1].goki.genre.name %>)
+							<span>
+								<a href="/maingokis/gindex/<%= @users[i-1].goki.id %>">select</a>
+								<% if current_user.gold > @gokiedit_gold.cost %>
+									<%= link_to edit_gokicollection_path(id: @users[i-1].goki.id), data:{confirm:"Pay "+@gokiedit_gold.cost.to_s+" gold to edit this goki?"}, class:"edittag" do %>edit<% end %>
+								<% end %>
+							</span>
+						</p>
+						<p class="gokidesc"><%= @users[i-1].goki.description %></p>
+					</div>
+				</div>
+
+			<% elsif !(@users[i-1].nil?) && (@users[i-1].goki.status=="dead") %>
+				<div class="cell" id="cell"+<%= i.to_s %>>
+					<div class="cell_top" id="cell_top"+<%= i.to_s %>>
+						<%= image_tag "maingokis/index/heroes/"+@users[i-1].goki.img+".png", :size=>"230x130", :class=>"deadgokis", :id=>"goki"+i.to_s %>
+					</div>
+					<div class="cell_buttom" id="cell_buttom"+<%= i.to_s %>>
+						<p class="gokiname"><%= @users[i-1].goki.name %> (<%= @users[i-1].goki.genre.name %>) <a href="/gokicollections/restore/<%= @users[i-1].goki.id %>" data-confirm="restore <%= @users[i-1].goki.name %> for <%= @restore_gold.cost.to_s %> gold? (if your gold is under <%= @restore_thresh.cost.to_s %>, this is free)">restore</a></p>
+						<p class="gokidesc"><%= @users[i-1].goki.description %></p>
+					</div>
+				</div>
+
+			<% else %>
+				<div class="cell" id="cell"+<%= i.to_s %>>
+					<div class="cell_top" id="cell_top"+<%= i.to_s %>></div>
+					<div class="cell_buttom" id="cell_buttom"+<%= i.to_s %>></div>
+				</div>
+			<% end %>
+		<% end %>
+	</div>
+</main>
+
+
+
+
+
+<footer id="indexfooter">
+	<div class="editbar">
+		<% if @goki_count<9 %>
+			<% if @goki_count>0 && current_user.gold>@gokiadd_gold.cost %>
+				<%= link_to new_gokicollection_path, data:{confirm:"Pay "+@gokiadd_gold.cost.to_s+" gold to make goki?"} do %>
+					<%= image_tag "gokicollections/index/newbutton.png", :size=>"100x100", :class=>"footbutton" %>
+				<% end %>
+			<% elsif @goki_count<=0 %>
+				<%= link_to new_gokicollection_path, data:{confirm:"Rememeber when adding more than two goki, this will require "+@gokiadd_gold.cost.to_s+" gold to make goki"} do %>
+					<%= image_tag "gokicollections/index/newbutton.png", :size=>"100x100", :class=>"footbutton" %>
+				<% end %>
+			<% end %>
+		<% end %>
+		
+		<%= image_submit_tag "gokicollections/index/deletebutton.png", :class=>"footbutton", :id=>"deletebutton", data:{confirm:"Are you sure? this won't require any gold."} %>
+
+		<%= link_to gokicollections_gokiexp_path do %>
+			<%= image_tag "gokicollections/index/book.png", :size=>"100x100", :class=>"footbutton" %>
+		<% end %>
+
+		<%= link_to gokicollections_ranking_path do %>
+			<%= image_tag "gokicollections/ranking/rankinglink.png", :size=>"100x100", :class=>"footbutton" %>
+		<% end %>
+
+		<%= link_to gokicollections_shop_path do %>
+			<%= image_tag "gokicollections/shop/shopbutton.png", :size=>"100x100", :class=>"footbutton" %>
+		<% end %>
+
+		<p id="gold">Gold: <%= current_user.gold %></p>
+	</div>
+</footer>
+<% end %>

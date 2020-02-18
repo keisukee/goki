@@ -1,0 +1,364 @@
+$(document).on("turbolinks:load", function() {
+	var space   = document.getElementById("spacebar");
+	var environ = document.getElementById("environ");
+	var goki = document.getElementById("goki");
+	var score = 0;
+	var clickable = true;
+
+	if(gon.genre=="speedy"){
+		var speed = 45;
+		var clicktoclicktime = 2000;
+	}
+	else if(gon.genre=="balance"){
+		var speed = 30;
+		var clicktoclicktime = 1200;
+	}
+	else if(gon.genre="heavy"){
+		var speed = 20;
+		var clicktoclicktime = 500;
+	}
+
+
+
+	//moving
+	window.addEventListener("keydown", handleKeydown);
+	var uparrow    = 38;
+	var downarrow  = 40;
+	var leftarrow  = 37;
+	var rightarrow = 39;
+	var spacekey   = 32;
+	var key1       = 49;
+	var key2       = 50;
+
+
+	//idle
+	anime({
+		targets: goki,
+		rotate: 3,
+		direction: "alternate",
+		loop: true
+	});
+
+
+	//key moving
+	function handleKeydown(event) {
+		var key=event.keyCode;
+		var pos = $("#goki").offset();
+
+		if(key==uparrow && pos.top>160){
+			$("#goki").offset(function(i,elem){
+				return{
+					top:  elem.top - speed,
+					left: elem.left
+				};
+			});
+		}
+		if(key==downarrow && pos.top<650){
+			$("#goki").offset(function(i,elem){
+				return{
+					top:  elem.top + speed,
+					left: elem.left
+				};
+			});
+		}
+		if(key==leftarrow && pos.left>-10){
+			$("#goki").offset(function(i,elem){
+				return{
+					top:  elem.top,
+					left: elem.left - speed
+				};
+			});
+		}
+		if(key==rightarrow && pos.left<1236){
+			$("#goki").offset(function(i,elem){
+				return{
+					top:  elem.top,
+					left: elem.left + speed
+				};
+			});
+		}
+		if(key==key1){
+			document.getElementsByClassName("move1")[0].click();
+		}
+		if(key==key2){
+			document.getElementsByClassName("move2")[0].click();
+		}
+
+
+		//space
+		if(key==spacekey) {
+			anime({
+				targets: goki,
+				translateX: 200,
+				duration: 300,
+				direction: "alternate"
+			});
+			score += 1;
+		}
+	}
+
+
+
+
+	//enemy move
+	anime({
+		targets: ".jet",
+		translateY: 10,
+		direction: "alternate",
+		loop: true
+	});
+
+
+
+	//arrows
+	var field = document.getElementsByClassName("heroes")[0];
+	var maxtop = 750;
+	var mintop = 220;
+	var maxspeed = 30;
+	var minspeed = 10;
+	var arrow_speed = 50;
+	var ghalfwidth = Number($("#goki").css("width").slice(0,-2))/2;
+	var ghalfheight = Number($("#goki").css("height").slice(0,-2))/2;
+
+
+	//arrow generation
+	function generate_arrow() {
+		var arrow = document.createElement("img");
+		arrow.src = "<%= asset_path "maingokis/index/enemy/arrow.png" %>";
+		arrow.style.width = "120px";
+		arrow.style.height = "30px";
+		arrow.style.float = "right";
+		arrow.style.left = "1400px";
+		arrow.style.top = String(Math.floor(
+			Math.random()*(maxtop-mintop) + mintop
+		)) + "px";
+		arrow.style.position = "absolute";
+		arrow.classList.add("arrow");
+		field.appendChild(arrow);
+	}
+
+	setInterval(
+		function(){
+			generate_arrow();
+		}
+	, 500);
+
+
+	//arrow move & destroy & collision
+	setInterval(
+		function(){
+			$(".arrow").each(function(i,elem){
+				//collision
+				var xdist = $("#goki").position().left + ghalfwidth - $(elem).position().left;
+				var ydist = $("#goki").position().top  + ghalfheight - $(elem).position().top;
+				var dist  = Math.pow(xdist,2) + Math.pow(ydist,2);
+				if(dist<2000) {
+					anime({
+						targets: goki,
+						rotate: 360,
+						duration: 1000
+					});
+					$.post("/maingokis/addgold", {gold:score, goki_id:gon.goki.id});
+				}
+
+				//destroy
+				if($(elem).position().left < 0){
+					$(elem).remove();
+					score += 1;
+					document.getElementById("score").innerHTML = String(score);
+				}
+			});
+
+			//arrow move
+			$(".arrow").offset(function(i,elem){
+				return {
+					top:  elem.top,
+					left: elem.left - arrow_speed
+				};
+			});
+		}
+	, 50);
+
+	
+
+	
+
+
+	//environment
+	var grass = "grass";
+	var sand = "sand";
+	var crack = "crack";
+
+	$("#environ").click(
+		function() {
+			var current = $(".main").css("background-image").toString();
+			if(current.includes(grass)==true){
+				$(".main").css("background-image", "url(<%= asset_path "maingokis/index/mainbg/sand.png" %>)");
+			}
+			else if(current.includes(sand)==true){
+				$(".main").css("background-image", "url(<%= asset_path "maingokis/index/mainbg/crack.png" %>)");
+			}
+			else if(current.includes(crack)==true){
+				$(".main").css("background-image", "url(<%= asset_path "maingokis/index/mainbg/grass.png" %>)");
+			}
+		}
+	)
+
+
+
+
+	
+	//movement of goki with icon
+	if($("#shiftY").length){
+		var shiftYduration = 450;
+		$("#shiftY").click(function(){
+			if(clickable){
+				clickable = false;
+				$(".movebutton").css("opacity", "0.5");
+				anime({
+					targets: goki,
+					translateY: 120,
+					duration: shiftYduration
+				});
+				if(gon.shiftY_enhance!=null){
+					score += gon.shiftY_enhance.value;
+				}
+				score += 5;
+				window.setTimeout(function(){
+					clickable=true;
+					$(".movebutton").css("opacity", "1.0");
+				}, shiftYduration+clicktoclicktime);
+			}
+		})
+	}
+
+	if($("#rotate").length){
+		var rotateduration = 1000;
+		$("#rotate").click(function(){
+			if(clickable){
+				clickable = false;
+				$(".movebutton").css("opacity", "0.5");
+				anime({
+					targets: goki,
+					rotate: 1080,
+					duration: rotateduration
+				});
+				if(gon.rotate_enhance!=null){
+					score += gon.rotate_enhance.value;
+				}
+				score += 10;
+				window.setTimeout(function(){
+					clickable=true;
+					$(".movebutton").css("opacity", "1.0");
+				}, rotateduration+clicktoclicktime);
+			}
+		})
+	}
+	
+	if($("#shiftback").length){
+		var shiftbackduration = 1000;
+		if(gon.shiftback_enhance!=null){
+			var backdist = gon.shiftback_enhance.value;
+		}else{
+			var backdist = -300;
+		}
+		$("#shiftback").click(function(){
+			if(clickable){
+				clickable = false;
+				$(".movebutton").css("opacity", "0.5");
+				anime({
+					targets: goki,
+					translateX: backdist,
+					direction: "alternate",
+					duration: shiftbackduration
+				});
+				score += 5;
+				window.setTimeout(function(){
+					clickable=true;
+					$(".movebutton").css("opacity", "1.0");
+				}, shiftbackduration*2+clicktoclicktime);
+			}
+		})
+	}
+	
+	if($("#enlarge").length){
+		if(gon.enlarge_enhance!=null){
+			var enlargeduration = gon.enlarge_enhance.value;
+		}else{
+			var enlargeduration = 3000;
+		}
+		$("#enlarge").click(function(){
+			if(clickable){
+				clickable = false;
+				$(".movebutton").css("opacity", "0.5");
+				anime({
+					targets: goki,
+					scale: 3,
+					direction: "alternate",
+					duration: enlargeduration
+				});
+				score += 30;
+				window.setTimeout(function(){
+					clickable=true;
+					$(".movebutton").css("opacity", "1.0");
+				}, enlargeduration*2+clicktoclicktime);
+			}
+		})
+	}
+	
+	if($("#disappear").length){
+		var disappearduration = 3000;
+		$("#disappear").click(function(){
+			if(clickable){
+				clickable = false;
+				$(".movebutton").css("opacity", "0.5");
+				goki.style.display = "none";
+				window.setTimeout(function(){
+					goki.style.display = "block";
+					window.setTimeout(function(){
+						clickable=true;
+						$(".movebutton").css("opacity", "1.0");
+					}, clicktoclicktime);
+				}, disappearduration);
+				if(gon.disappear_enhance!=null){
+					score+=gon.disappear_enhance.value;
+				}
+				score += 5;
+			}
+		})
+	}
+
+
+
+	//movement icon glow
+	if(gon.shiftY_enhance!=null){
+		$("#shiftY").css("filter", "drop-shadow(4px 4px 4px yellow)");
+	}
+	if(gon.rotate_enhance!=null){
+		$("#rotate").css("filter", "drop-shadow(4px 4px 4px green)");
+	}
+	if(gon.shiftback_enhance!=null){
+		$("#shiftback").css("filter", "drop-shadow(4px 4px 4px red)");
+	}
+	if(gon.enlarge_enhance!=null){
+		$("#enlarge").css("filter", "drop-shadow(4px 4px 4px brown)");
+	}
+	if(gon.disappear_enhance!=null){
+		$("#disappear").css("filter", "drop-shadow(4px 4px 4px white)");
+	}
+
+
+
+	//hover
+	$(".footbutton").hover(
+		function(){
+			anime({
+				targets: this,
+				rotate: 3,
+				direction: "alternate",
+				duration: 20
+			});
+		}
+	)
+});
+

@@ -1,0 +1,90 @@
+// Place all the styles related to the maingokis controller mwinhere.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: http://sass-lang.com/
+
+html {
+	height: 100%;
+}
+
+
+body {
+	height: 100%;
+	margin: 0;
+	width: 100%;
+
+	header {
+		height: 15%;
+		width: 100%;
+		background: image_url("maingokis/index/header/headerimg.png") repeat center center / 200px 200px;
+		display: flex;
+		flex-wrap: wrap;
+
+		h1 {
+			color: black;
+			text-shadow: 10px 20px 30px purple;
+			font-size: 80px;
+			text-align: center;
+			margin: 0 auto;
+			padding-Top: 20px;
+			font-familiy: "Homemade Apple", cursive;
+		}
+
+		#logoutbutton {
+			padding: 10px;
+		}
+
+		#score_board {
+			background: linear-gradient(white, gold);
+			margin-left: auto;
+			margin-buttom: 5px;
+			margin-top: 10px;
+			border: solid 5px black;
+			height: 80%;
+		}
+	}
+
+	main {
+		height: 73%;
+		width: 100%;
+		background-image: image_url("maingokis/index/mainbg/grass.png");
+		background-size: 1500px 700px;
+		border-top: solid 5px black;
+		border-bottom: solid 5px black;
+
+		.heroes {
+			height: 100%;
+			width: 90%;
+			float: left;
+			display: flex;
+			flex-wrap: wrap;
+		}
+
+		.enemies {
+			text-align: center;
+			height: 100%;
+			width: 10%;
+			float: right;
+		}
+
+		#explanation {
+			text-align: center;
+			text-shadow: 10px 20px 30px purple;
+			font-familiy: "Homemade Apple", cursive;
+			-webkit-text-stroke-width: 1px;
+			-webkit-text-stroke-color: purple;
+		}
+	}
+
+	footer {
+		height: 12%;
+		width: 100%;
+		background: image_url("maingokis/index/footer/footerimg.png") repeat center center / 200px 200px;
+		margin: 0;
+		text-align: center;
+
+		.controller {
+			display: inline-block;
+			text-align: center;
+		}
+	}
+}

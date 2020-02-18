@@ -1,0 +1,41 @@
+<header>
+	<h1>Save Goki From the Evil Jetman!!!</h1>
+	<% if user_signed_in? %>
+		<%= link_to destroy_user_session_path, method: :delete do %>
+			<%= image_tag "maingokis/share/logout.png", :size=>"100x100", :id=>"logoutbutton" %>
+		<% end %>
+	<% end %>
+</header>
+
+
+
+<main class="main">
+	<div id="explanation">
+		<h3>Movement:</h3>
+		<p>press arrow keys to move the goki up/down/right/left</p>
+		<p>press space bar or "1", "2" key to use goki tricks! (additional scores will be added)</p>
+		
+		<h3>Icons</h3>
+		<p>top purple icon makes you log out</p>
+		<p>two gold icons makes goki do tricks. ("1" key binded for left and "2" for right)</p>
+		<p>icon with green bamboo changes background image</p>
+		<p>icon with yellow window closed moves you to gokicollection page</p>
+		
+		<h3>Goki Collection</h3>
+		<p>you can add/edit/destroy goki in gokicollection page.</p>
+		<p>press "select" to choose goki and regist attack from evil gokijet!</p>
+	</div>
+</main>
+
+
+
+<footer>
+	<div class="controller">
+		<%= image_tag "maingokis/index/footer/move/shiftY.png", :size=>"100x100", :id=>"spacebar", :class=>"footbutton" %>
+		<%= image_tag "maingokis/index/footer/move/rotate.png", :size=>"100x100", :id=>"spacebar", :class=>"footbutton" %>
+		<%= image_tag "maingokis/index/footer/envbutton.png", :size=>"100x100", :id=>"environ", :class=>"footbutton" %>
+		<%= link_to gokicollections_path do %>
+			<%= image_tag "maingokis/index/footer/homebutton.png", :size=>"100x100", :id=>"home", :class=>"footbutton" %>
+		<% end %>
+	</div>
+<footer>
